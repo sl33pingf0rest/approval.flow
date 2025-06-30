@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Implémentation Flux d'Approbation - Équipe Finance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(0,0,0,0.3);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .slide-counter {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .slide {
+            display: none;
+            flex: 1;
+            padding: 2rem 3rem;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, #fff, #f0f9ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        h3 {
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            color: #e0f2fe;
+        }
+
+        h4 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #ffd700;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #e0f2fe;
+            opacity: 0.9;
+        }
+
+        .content {
+            max-width: 1100px;
+            margin: 0 auto;
+            text-align: left;
+            width: 100%;
+        }
+
+        .agenda, .checklist, .timeline {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .agenda ol {
+            font-size: 1.2rem;
+            line-height: 2.2;
+            padding-left: 1.5rem;
+        }
+
+        .agenda li {
+            margin: 1rem 0;
+            padding-left: 0.5rem;
+        }
+
+        .checklist li {
+            list-style: none;
+            margin: 0.8rem 0;
+            padding-left: 2.5rem;
+            position: relative;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .checklist li:before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .status-card {
+            background: rgba(255,255,255,0.12);
+            border-radius: 15px;
+            padding: 2rem;
+            border-left: 4px solid;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+
+        .status-card.completed { border-color: #10b981; }
+        .status-card.in-progress { border-color: #f59e0b; }
+        .status-card.pending { border-color: #ef4444; }
+        .status-card.important { border-color: #8b5cf6; }
+
+        .timeline-item {
+            background: rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 1.8rem;
+            margin: 1.2rem 0;
+            border-left: 4px solid #3b82f6;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            transform: translateX(5px);
+        }
+
+        .timeline-item h4 {
+            color: #60a5fa;
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        .timeline-item p {
+            margin: 0.5rem 0;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .risk-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .risk-item {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 10px;
+            padding: 1.2rem;
+            margin: 0.8rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .mitigation-item {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 10px;
+            padding: 1.2rem;
+            margin: 0.8rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .urgent {
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .contact-card {
+            background: rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .contact-card:hover {
+            transform: scale(1.05);
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transition: width 0.4s ease;
+            z-index: 100;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .emoji {
+            font-size: 1.5rem;
+            margin-right: 0.8rem;
+        }
+
+        .intro-content {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .intro-content p {
+            font-size: 1.1rem;
+            margin: 1rem 0;
+            line-height: 1.6;
+        }
+
+        ul {
+            text-align: left;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        ul li {
+            margin: 0.8rem 0;
+        }
+
+        .highlight-box {
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.2);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="progress-bar" id="progressBar"></div>
+        
+        <div class="header">
+            <div class="logo">🏦 DEMINOR LITIGATION FUNDING</div>
+            <div class="slide-counter">
+                <span id="currentSlide">1</span> / <span id="totalSlides">9</span>
+            </div>
+        </div>
+
+        <!-- Slide 1: Titre -->
+        <div class="slide active">
+            <div class="intro-content">
+                <h1>Implémentation des Flux d'Approbation Continia</h1>
+                <div class="subtitle">Prochaines étapes pour l'équipe Finance</div>
+                <div class="subtitle">Mai 2025</div>
+                <div style="margin-top: 3rem;">
+                    <p><strong>Présentateur :</strong> Arnaud Dalaroy - Accounting Analyst</p>
+                    <p><strong>Destinataire :</strong> Équipe Finance Deminor</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Agenda -->
+        <div class="slide">
+            <h2>📋 Agenda</h2>
+            <div class="content">
+                <div class="agenda">
+                    <ol>
+                        <li>Rappel du contexte et état d'avancement</li>
+                        <li>Planning détaillé d'implémentation</li>
+                        <li>Vos responsabilités spécifiques</li>
+                        <li>Communication avec nos fournisseurs</li>
+                        <li>Gestion des risques et exceptions</li>
+                        <li>Actions immédiates requises</li>
+                        <li>Support et contacts</li>
+                        <li>Questions & échanges</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Contexte -->
+        <div class="slide">
+            <h2>🎯 Rappel du Contexte</h2>
+            <div class="content">
+                <div class="status-grid">
+                    <div class="status-card completed">
+                        <h4><span class="emoji">✅</span>Déjà opérationnel</h4>
+                        <ul>
+                            <li>Continia OCR configuré depuis janvier</li>
+                            <li>Templates fournisseurs en cours de création</li>
+                            <li>Workflow d'approbation paramétré</li>
+                            <li>Web Portal disponible (inclus dans notre licence)</li>
+                            <li>Boîte e-invoicing configurée</li>
+                        </ul>
+                    </div>
+                    <div class="status-card in-progress">
+                        <h4><span class="emoji">🔄</span>Étapes suivantes</h4>
+                        <ul>
+                            <li>Test pilote avec 5 fournisseurs clés</li>
+                            <li>Communication à tous nos fournisseurs</li>
+                            <li>Formation/tutoriel pour les utilisateurs</li>
+                            <li>Déploiement complet en production</li>
+                            <li>Suivi et optimisations</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <h4><span class="emoji">🎉</span>Bonne nouvelle !</h4>
+                    <p>La démonstration lors du Finance Meeting a été un succès. L'équipe est prête pour passer aux étapes suivantes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Planning -->
+        <div class="slide">
+            <h2>📅 Planning Détaillé d'Implémentation</h2>
+            <div class="content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4><span class="emoji">🧪</span>Phase 1 - Test Pilote (Semaine en cours)</h4>
+                        <p><strong>Action :</strong> Sélection et test avec 5 fournisseurs clés</p>
+                        <p><strong>Objectif :</strong> Valider le processus en conditions réelles</p>
+                        <p><strong>Responsable :</strong> Arnaud + Équipe Finance</p>
+                        <p><strong>Durée :</strong> 1 semaine</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4><span class="emoji">📧</span>Phase 2 - Communication Fournisseurs (Semaine suivante)</h4>
+                        <p><strong>Action :</strong> Envoi email d'information à tous nos fournisseurs</p>
+                        <p><strong>Objectif :</strong> Informer du changement vers e-invoicing</p>
+                        <p><strong>Responsable :</strong> Équipe Finance + Arnaud</p>
+                        <p><strong>Durée :</strong> 3-5 jours</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4><span class="emoji">📚</span>Phase 3 - Formation Utilisateurs (Parallèle)</h4>
+                        <p><strong>Action :</strong> Création tutoriel + formation équipes</p>
+                        <p><strong>Objectif :</strong> Autonomie complète des utilisateurs</p>
+                        <p><strong>Responsable :</strong> Arnaud</p>
+                        <p><strong>Durée :</strong> En cours</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4><span class="emoji">🚀</span>Phase 4 - Go-Live Complet (Dans 2-3 semaines)</h4>
+                        <p><strong>Action :</strong> Déploiement pour tous les fournisseurs</p>
+                        <p><strong>Objectif :</strong> Processus 100% automatisé</p>
+                        <p><strong>Responsable :</strong> Toute l'équipe</p>
+                        <p><strong>Durée :</strong> Déploiement progressif sur 1 semaine</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Responsabilités -->
+        <div class="slide">
+            <h2>👥 Vos Responsabilités Spécifiques</h2>
+            <div class="content">
+                <div class="status-grid">
+                    <div class="status-card important">
+                        <h4><span class="emoji">📋</span>Validation et Configuration</h4>
+                        <ul>
+                            <li>Valider la liste des approbateurs par niveau</li>
+                            <li>Confirmer les seuils d'approbation (€2,500 / €10,000+)</li>
+                            <li>Définir les délais maximum d'approbation</li>
+                            <li>Identifier les processus d'exception</li>
+                        </ul>
+                    </div>
+                    <div class="status-card important">
+                        <h4><span class="emoji">🏢</span>Coordination Interne</h4>
+                        <ul>
+                            <li>Fournir la liste complète des fournisseurs actifs</li>
+                            <li>Coordonner avec les services utilisateurs</li>
+                            <li>Assurer le support de première ligne</li>
+                            <li>Suivre les performances du nouveau processus</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <h4><span class="emoji">📖</span>À propos de la formation</h4>
+                    <p>Nous préparons un <strong>tutoriel détaillé</strong> que vous pourrez consulter à votre rythme. 
+                    En cas de questions ou difficultés, vous pourrez toujours nous contacter pour un accompagnement personnalisé.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Communication fournisseurs -->
+        <div class="slide">
+            <h2>📧 Communication avec nos Fournisseurs</h2>
+            <div class="content">
+                <div class="highlight-box">
+                    <h4><span class="emoji">⚠️</span>Timing crucial</h4>
+                    <p>La communication doit être faite <strong>au bon moment</strong> - après validation complète du test pilote et avant le go-live général.</p>
+                </div>
+                
+                <div class="status-grid">
+                    <div class="status-card">
+                        <h4><span class="emoji">📝</span>Préparation de l'email</h4>
+                        <ul>
+                            <li>Email type en cours de rédaction par Arnaud</li>
+                            <li>Explication claire du passage aux boîtes e-invoicing</li>
+                            <li>Instructions techniques simples</li>
+                            <li>Contacts support dédiés</li>
+                            <li>Timeline de mise en œuvre</li>
+                        </ul>
+                    </div>
+                    <div class="status-card">
+                        <h4><span class="emoji">🎯</span>Objectifs de la communication</h4>
+                        <ul>
+                            <li>Informer du changement de processus</li>
+                            <li>Communiquer les nouvelles adresses e-invoicing</li>
+                            <li>Préciser les formats acceptés (PDF, XML)</li>
+                            <li>Donner un contact support : accounting@deminor.com</li>
+                            <li>Rassurer sur l'accompagnement</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <h4><span class="emoji">📅</span>Planning Communication</h4>
+                    <p><strong>Semaine prochaine :</strong> Validation de l'email type avec l'équipe Finance</p>
+                    <p><strong>Après test pilote réussi :</strong> Envoi massif à tous les fournisseurs</p>
+                    <p><strong>Support continu :</strong> accounting@deminor.com pour toutes questions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Gestion des risques -->
+        <div class="slide">
+            <h2>⚠️ Gestion des Risques et Exceptions</h2>
+            <div class="content">
+                <div class="risk-grid">
+                    <div class="status-card">
+                        <h4><span class="emoji">🚨</span>Risques Identifiés</h4>
+                        <div class="risk-item">
+                            <strong>Résistance au changement</strong><br>
+                            Certains utilisateurs peuvent être réticents au nouveau processus
+                        </div>
+                        <div class="risk-item">
+                            <strong>Fournisseurs non-conformes</strong><br>
+                            Difficulté d'adaptation aux nouvelles procédures e-invoicing
+                        </div>
+                        <div class="risk-item">
+                            <strong>Erreurs OCR</strong><br>
+                            Factures complexes mal reconnues par l'extraction automatique
+                        </div>
+                        <div class="risk-item">
+                            <strong>Surcharge support initial</strong><br>
+                            Pics de questions pendant la phase de déploiement
+                        </div>
+                    </div>
+                    <div class="status-card">
+                        <h4><span class="emoji">🛡️</span>Plans de Mitigation</h4>
+                        <div class="mitigation-item">
+                            <strong>Formation et accompagnement</strong><br>
+                            Tutoriels détaillés + support personnalisé disponible
+                        </div>
+                        <div class="mitigation-item">
+                            <strong>Communication proactive</strong><br>
+                            FAQ complète + contact support dédié + suivi personnalisé
+                        </div>
+                        <div class="mitigation-item">
+                            <strong>Processus de correction manuelle</strong><br>
+                            Procédures documentées pour traiter les cas complexes
+                        </div>
+                        <div class="mitigation-item">
+                            <strong>Support renforcé temporaire</strong><br>
+                            Équipe mobilisée pendant les 2 premières semaines
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <h4><span class="emoji">🔄</span>Processus d'escalade</h4>
+                    <p><strong>Niveau 1 :</strong> Questions fonctionnelles → Arnaud Dalaroy</p>
+                    <p><strong>Niveau 2 :</strong> Problèmes techniques → David Amic</p>
+                    <p><strong>Niveau 3 :</strong> Décisions stratégiques → Bertrand Beauchesne (CFO)</p>
+                    <p><strong>Support IT :</strong> Franky Van Gijsel (Manager IT et Finance)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Actions immédiates -->
+        <div class="slide">
+            <h2>✅ Actions Immédiates - Check-list Finance</h2>
+            <div class="content">
+                <div class="status-grid">
+                    <div class="status-card urgent">
+                        <h4><span class="emoji">🚨</span>À faire CETTE SEMAINE</h4>
+                        <div class="checklist">
+                            <ul>
+                                <li>Valider la matrice d'approbation finale</li>
+                                <li>Fournir la liste complète des fournisseurs par service</li>
+                                <li>Identifier les 5 fournisseurs pour le test pilote</li>
+                                <li>Confirmer les coordonnées de contact pour chaque service</li>
+                                <li>Désigner un référent par service pour les questions</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="status-card">
+                        <h4><span class="emoji">📋</span>À préparer pour SEMAINE PROCHAINE</h4>
+                        <div class="checklist">
+                            <ul>
+                                <li>Préparer quelques factures types pour les tests</li>
+                                <li>Informer vos services du changement à venir</li>
+                                <li>Organiser le monitoring de accounting@deminor.com</li>
+                                <li>Préparer les coordonnées complètes des fournisseurs</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="highlight-box">
+                    <h4><span class="emoji">⏰</span>Priorité absolue</h4>
+                    <p>La <strong>liste des fournisseurs</strong> et la <strong>validation de la matrice d'approbation</strong> sont critiques pour pouvoir démarrer le test pilote cette semaine.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Support -->
+        <div class="slide">
+            <h2>🆘 Support et Contacts</h2>
+            <div class="content">
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <h4><span class="emoji">👨‍💼</span>Chef de Projet</h4>
+                        <p><strong>Arnaud Dalaroy</strong></p>
+                        <p>Accounting Analyst</p>
+                        <p>arnaud.dalaroy@deminor.com</p>
+                        <p><em>Lead du projet d'implémentation</em></p>
+                    </div>
+                    <div class="contact-card">
+                        <h4><span class="emoji">💼</span>Sponsor Exécutif</h4>
+                        <p><strong>Bertrand Beauchesne</strong></p>
+                        <p>CFO (Chief Financial Officer)</p>
+                        <p>bertrand.beauchesne@deminor.com</p>
+                        <p><em>Décisions stratégiques</em></p>
+                    </div>
+                    <div class="contact-card">
+                        <h4><span class="emoji">🔧</span>Support Technique</h4>
+                        <p><strong>David Amic</strong></p>
+                        <p>Senior Accountant</p>
+                        <p>David.Amic@deminor.com</p>
+                        <p><em>Support fonctionnel BC</em></p>
+                    </div>
+                    <div class="contact-card">
+                        <h4><span class="emoji">💻</span>Manager IT & Finance</h4>
+                        <p><strong>Franky Van Gijsel</strong></p>
+                        <p>Manager IT et Finance</p>
+                        <p>franky.vangijsel@deminor.com</p>
+                        <p><em>Support technique et coordination</em></p>
+                    </div>
+                </div>
+                
+                <div class="info-box" style="margin-top: 2rem;">
+                    <h4><span class="emoji">📞</span>Qui contacter pour quoi ?</h4>
+                    <p><strong>Questions sur le processus :</strong> Arnaud Dalaroy</p>
+                    <p><strong>Problèmes techniques BC :</strong> David Amic</p>
+                    <p><strong>Issues IT/infrastructure :</strong> Franky Van Gijsel</p>
+                    <p><strong>Décisions business :</strong> Bertrand Beauchesne</p>
+                    <p><strong>Support fournisseurs :</strong> accounting@deminor.com</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Questions -->
+        <div class="slide">
+            <h2>❓ Questions & Échanges</h2>
+            <div class="content">
+                <div class="status-grid">
+                    <div class="status-card">
+                        <h4><span class="emoji">❓</span>Questions fréquentes</h4>
+                        <ul>
+                            <li>Que faire si un fournisseur refuse le changement ?</li>
+                            <li>Comment gérer les factures urgentes pendant la transition ?</li>
+                            <li>Que se passe-t-il si l'OCR ne reconnaît pas une facture ?</li>
+                            <li>Comment ajouter un nouveau fournisseur au système ?</li>
+                            <li>Peut-on revenir temporairement à l'ancien processus ?</li>
+                        </ul>
+                    </div>
+                    <div class="status-card">
+                        <h4><span class="emoji">💬</span>Vos questions</h4>
+                        <ul>
+                            <li>Préoccupations spécifiques à votre service</li>
+                            <li>Suggestions d'amélioration du processus</li>
+                            <li>Besoins de support particuliers</li>
+                            <li>Planning et disponibilités</li>
+                            <li>Clarifications sur les responsabilités</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 3rem;">
+                    <h3><span class="emoji">🎯</span>Prêts pour le Test Pilote ?</h3>
+                    <p style="font-size: 1.3rem; margin-top: 1rem;">Démarrons ensemble cette transition vers un processus plus efficace !</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+            <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            
+            document.getElementById('currentSlide').textContent = index + 1;
+            document.getElementById('progressBar').style.width = ((index + 1) / totalSlides) * 100 + '%';
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            const newIndex = currentSlideIndex + direction;
+            if (newIndex >= 0 && newIndex < totalSlides) {
+                currentSlideIndex = newIndex;
+                showSlide(currentSlideIndex);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            switch(event.key) {
+                case 'ArrowRight':
+                case ' ':
+                case 'PageDown':
+                    changeSlide(1);
+                    event.preventDefault();
+                    break;
+                case 'ArrowLeft':
+                case 'PageUp':
+                    changeSlide(-1);
+                    event.preventDefault();
+                    break;
+                case 'Home':
+                    currentSlideIndex = 0;
+                    showSlide(currentSlideIndex);
+                    event.preventDefault();
+                    break;
+                case 'End':
+                    currentSlideIndex = totalSlides - 1;
+                    showSlide(currentSlideIndex);
+                    event.preventDefault();
+                    break;
+            }
+        });
+
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>
+                        
