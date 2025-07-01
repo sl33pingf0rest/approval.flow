@@ -111,7 +111,60 @@
             width: 100%;
         }
 
-        .agenda, .checklist, .timeline {
+        .agenda {
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 1rem 0;
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.25);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .agenda ol {
+            font-size: 1.3rem;
+            line-height: 2.5;
+            padding-left: 2rem;
+            counter-reset: agenda-counter;
+            list-style: none;
+        }
+
+        .agenda li {
+            margin: 1.5rem 0;
+            padding: 1rem 1.5rem;
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            border-left: 4px solid #60a5fa;
+            counter-increment: agenda-counter;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .agenda li:hover {
+            transform: translateX(10px);
+            background: rgba(255,255,255,0.12);
+        }
+
+        .agenda li::before {
+            content: counter(agenda-counter);
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .checklist, .timeline {
             background: rgba(255,255,255,0.1);
             border-radius: 15px;
             padding: 2rem;
@@ -119,17 +172,6 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        }
-
-        .agenda ol {
-            font-size: 1.2rem;
-            line-height: 2.2;
-            padding-left: 1.5rem;
-        }
-
-        .agenda li {
-            margin: 1rem 0;
-            padding-left: 0.5rem;
         }
 
         .checklist li {
@@ -357,9 +399,9 @@
         <div class="progress-bar" id="progressBar"></div>
         
         <div class="header">
-            <div class="logo">🏦 DEMINOR LITIGATION FUNDING</div>
+            <div class="logo">🏦 DEMINOR RECOVERY SERVICES</div>
             <div class="slide-counter">
-                <span id="currentSlide">1</span> / <span id="totalSlides">9</span>
+                <span id="currentSlide">1</span> / <span id="totalSlides">10</span>
             </div>
         </div>
 
@@ -368,7 +410,7 @@
             <div class="intro-content">
                 <h1>Implémentation des Flux d'Approbation Continia</h1>
                 <div class="subtitle">Prochaines étapes pour l'équipe Finance</div>
-                <div class="subtitle">Mai 2025</div>
+                <div class="subtitle">Juillet 2025</div>
                 <div style="margin-top: 3rem;">
                     <p><strong>Présentateur :</strong> Arnaud Dalaroy - Accounting Analyst</p>
                     <p><strong>Destinataire :</strong> Équipe Finance Deminor</p>
@@ -413,9 +455,9 @@
                     <div class="status-card in-progress">
                         <h4><span class="emoji">🔄</span>Étapes suivantes</h4>
                         <ul>
+                            <li>Formation utilisateurs avec captures d'écran détaillées</li>
                             <li>Test pilote avec 5 fournisseurs clés</li>
                             <li>Communication à tous nos fournisseurs</li>
-                            <li>Formation/tutoriel pour les utilisateurs</li>
                             <li>Déploiement complet en production</li>
                             <li>Suivi et optimisations</li>
                         </ul>
@@ -423,7 +465,7 @@
                 </div>
                 <div class="highlight-box">
                     <h4><span class="emoji">🎉</span>Bonne nouvelle !</h4>
-                    <p>La démonstration lors du Finance Meeting a été un succès. L'équipe est prête pour passer aux étapes suivantes.</p>
+                    <p>La démonstration lors du Finance Meeting a été un succès. L'équipe est prête pour passer aux étapes suivantes avec une approche structurée.</p>
                 </div>
             </div>
         </div>
@@ -434,32 +476,32 @@
             <div class="content">
                 <div class="timeline">
                     <div class="timeline-item">
-                        <h4><span class="emoji">🧪</span>Phase 1 - Test Pilote (Semaine en cours)</h4>
-                        <p><strong>Action :</strong> Sélection et test avec 5 fournisseurs clés</p>
-                        <p><strong>Objectif :</strong> Valider le processus en conditions réelles</p>
-                        <p><strong>Responsable :</strong> Arnaud + Équipe Finance</p>
-                        <p><strong>Durée :</strong> 1 semaine</p>
+                        <h4><span class="emoji">📚</span>Phase 1 - Formation Utilisateurs (Semaine en cours)</h4>
+                        <p><strong>Action :</strong> Présentation détaillée avec captures d'écran des différents modules d'approbation</p>
+                        <p><strong>Objectif :</strong> Maîtrise complète de l'interface et des workflows par tous les utilisateurs</p>
+                        <p><strong>Responsable :</strong> Arnaud + Sessions de formation par équipe</p>
+                        <p><strong>Durée :</strong> 1 semaine (sessions individuelles par service)</p>
                     </div>
                     <div class="timeline-item">
-                        <h4><span class="emoji">📧</span>Phase 2 - Communication Fournisseurs (Semaine suivante)</h4>
+                        <h4><span class="emoji">🧪</span>Phase 2 - Test Pilote (Semaine suivante)</h4>
+                        <p><strong>Action :</strong> Mise en place et test avec 5 fournisseurs clés</p>
+                        <p><strong>Objectif :</strong> Valider le processus complet en conditions réelles</p>
+                        <p><strong>Responsable :</strong> Équipe Finance formée + Arnaud</p>
+                        <p><strong>Durée :</strong> 1 semaine de tests intensifs</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4><span class="emoji">📧</span>Phase 3 - Communication Fournisseurs (Après validation)</h4>
                         <p><strong>Action :</strong> Envoi email d'information à tous nos fournisseurs</p>
-                        <p><strong>Objectif :</strong> Informer du changement vers e-invoicing</p>
+                        <p><strong>Objectif :</strong> Informer du changement vers e-invoicing avec processus validé</p>
                         <p><strong>Responsable :</strong> Équipe Finance + Arnaud</p>
-                        <p><strong>Durée :</strong> 3-5 jours</p>
+                        <p><strong>Durée :</strong> 3-5 jours (communication échelonnée)</p>
                     </div>
                     <div class="timeline-item">
-                        <h4><span class="emoji">📚</span>Phase 3 - Formation Utilisateurs (Parallèle)</h4>
-                        <p><strong>Action :</strong> Création tutoriel + formation équipes</p>
-                        <p><strong>Objectif :</strong> Autonomie complète des utilisateurs</p>
-                        <p><strong>Responsable :</strong> Arnaud</p>
-                        <p><strong>Durée :</strong> En cours</p>
-                    </div>
-                    <div class="timeline-item">
-                        <h4><span class="emoji">🚀</span>Phase 4 - Go-Live Complet (Dans 2-3 semaines)</h4>
-                        <p><strong>Action :</strong> Déploiement pour tous les fournisseurs</p>
-                        <p><strong>Objectif :</strong> Processus 100% automatisé</p>
-                        <p><strong>Responsable :</strong> Toute l'équipe</p>
-                        <p><strong>Durée :</strong> Déploiement progressif sur 1 semaine</p>
+                        <h4><span class="emoji">🚀</span>Phase 4 - Go-Live Complet (Dans 3-4 semaines)</h4>
+                        <p><strong>Action :</strong> Déploiement pour tous les fournisseurs - 100% des factures dans l'approval flow</p>
+                        <p><strong>Objectif :</strong> Processus entièrement automatisé et généralisé</p>
+                        <p><strong>Responsable :</strong> Toute l'équipe formée et opérationnelle</p>
+                        <p><strong>Durée :</strong> Déploiement progressif sur 1-2 semaines</p>
                     </div>
                 </div>
             </div>
@@ -474,7 +516,7 @@
                         <h4><span class="emoji">📋</span>Validation et Configuration</h4>
                         <ul>
                             <li>Valider la liste des approbateurs par niveau</li>
-                            <li>Confirmer les seuils d'approbation (€2,500 / €10,000+)</li>
+                            <li>Confirmer les seuils d'approbation (€10,000 directeurs / €50,000+ partners)</li>
                             <li>Définir les délais maximum d'approbation</li>
                             <li>Identifier les processus d'exception</li>
                         </ul>
@@ -491,7 +533,7 @@
                 </div>
                 <div class="info-box">
                     <h4><span class="emoji">📖</span>À propos de la formation</h4>
-                    <p>Nous préparons un <strong>tutoriel détaillé</strong> que vous pourrez consulter à votre rythme. 
+                    <p>Nous préparons une <strong>présentation détaillée avec captures d'écran</strong> de tous les modules d'approbation que vous pourrez consulter et pratiquer. 
                     En cas de questions ou difficultés, vous pourrez toujours nous contacter pour un accompagnement personnalisé.</p>
                 </div>
             </div>
@@ -503,7 +545,7 @@
             <div class="content">
                 <div class="highlight-box">
                     <h4><span class="emoji">⚠️</span>Timing crucial</h4>
-                    <p>La communication doit être faite <strong>au bon moment</strong> - après validation complète du test pilote et avant le go-live général.</p>
+                    <p>La communication doit être faite <strong>au bon moment</strong> - après formation complète de l'équipe ET validation complète du test pilote.</p>
                 </div>
                 
                 <div class="status-grid">
@@ -530,8 +572,8 @@
                 </div>
 
                 <div class="timeline-item">
-                    <h4><span class="emoji">📅</span>Planning Communication</h4>
-                    <p><strong>Semaine prochaine :</strong> Validation de l'email type avec l'équipe Finance</p>
+                    <h4><span class="emoji">📅</span>Planning Communication Révisé</h4>
+                    <p><strong>Après formation équipe :</strong> Validation de l'email type avec l'équipe Finance formée</p>
                     <p><strong>Après test pilote réussi :</strong> Envoi massif à tous les fournisseurs</p>
                     <p><strong>Support continu :</strong> accounting@deminor.com pour toutes questions</p>
                 </div>
@@ -565,8 +607,8 @@
                     <div class="status-card">
                         <h4><span class="emoji">🛡️</span>Plans de Mitigation</h4>
                         <div class="mitigation-item">
-                            <strong>Formation et accompagnement</strong><br>
-                            Tutoriels détaillés + support personnalisé disponible
+                            <strong>Formation approfondie en amont</strong><br>
+                            Captures d'écran détaillées + sessions pratiques par équipe
                         </div>
                         <div class="mitigation-item">
                             <strong>Communication proactive</strong><br>
@@ -599,25 +641,25 @@
             <div class="content">
                 <div class="status-grid">
                     <div class="status-card urgent">
-                        <h4><span class="emoji">🚨</span>À faire CETTE SEMAINE</h4>
+                        <h4><span class="emoji">🚨</span>À faire CETTE SEMAINE - Formation</h4>
                         <div class="checklist">
                             <ul>
-                                <li>Valider la matrice d'approbation finale</li>
-                                <li>Fournir la liste complète des fournisseurs par service</li>
-                                <li>Identifier les 5 fournisseurs pour le test pilote</li>
+                                <li>Participer aux sessions de formation avec captures d'écran</li>
+                                <li>Valider la matrice d'approbation finale (€10K/€50K)</li>
                                 <li>Confirmer les coordonnées de contact pour chaque service</li>
                                 <li>Désigner un référent par service pour les questions</li>
+                                <li>Identifier les 5 fournisseurs pour le test pilote</li>
                             </ul>
                         </div>
                     </div>
                     <div class="status-card">
-                        <h4><span class="emoji">📋</span>À préparer pour SEMAINE PROCHAINE</h4>
+                        <h4><span class="emoji">📋</span>À préparer pour SEMAINE PROCHAINE - Test Pilote</h4>
                         <div class="checklist">
                             <ul>
                                 <li>Préparer quelques factures types pour les tests</li>
-                                <li>Informer vos services du changement à venir</li>
                                 <li>Organiser le monitoring de accounting@deminor.com</li>
-                                <li>Préparer les coordonnées complètes des fournisseurs</li>
+                                <li>Préparer les coordonnées complètes des 5 fournisseurs test</li>
+                                <li>Informer vos services du changement à venir</li>
                             </ul>
                         </div>
                     </div>
@@ -625,7 +667,7 @@
                 
                 <div class="highlight-box">
                     <h4><span class="emoji">⏰</span>Priorité absolue</h4>
-                    <p>La <strong>liste des fournisseurs</strong> et la <strong>validation de la matrice d'approbation</strong> sont critiques pour pouvoir démarrer le test pilote cette semaine.</p>
+                    <p>La <strong>formation équipe</strong> et la <strong>validation de la matrice d'approbation</strong> sont critiques pour pouvoir démarrer le test pilote la semaine prochaine.</p>
                 </div>
             </div>
         </div>
@@ -703,7 +745,7 @@
                     </div>
                 </div>
                 <div style="text-align: center; margin-top: 3rem;">
-                    <h3><span class="emoji">🎯</span>Prêts pour le Test Pilote ?</h3>
+                    <h3><span class="emoji">🎯</span>Prêts pour la Formation et le Test Pilote ?</h3>
                     <p style="font-size: 1.3rem; margin-top: 1rem;">Démarrons ensemble cette transition vers un processus plus efficace !</p>
                 </div>
             </div>
@@ -774,4 +816,3 @@
     </script>
 </body>
 </html>
-                        
